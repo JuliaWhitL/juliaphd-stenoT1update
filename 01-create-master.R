@@ -32,9 +32,9 @@
 # value_motion (aka "no regular exercise": 1 for yes, 0 for no) 
 # macro_Albuminuria (1 for yes, 0 for no) 
 # micro_Albuminuria (1 for yes, 0 for no) 
-# Interaction term between age_cat and eGFR:
-  # eGFR for age <40 years (mL/min/1.73m2)
-  # eGFR for age >=40 years (mL/min/1.73m2)
+# Interaction term between age_cat and log2(eGFR):
+  # log2(eGFR) for age <40 years (mL/min/1.73m2)
+  # log2(eGFR) for age >=40 years (mL/min/1.73m2)
 
 ### NOTE: SUBMITTING YOUR LEARNER ---
 # Your submission should be a fitted model object that can be passed directly to
