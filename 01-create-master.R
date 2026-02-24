@@ -94,7 +94,7 @@ play$macro_Albuminuria <- ifelse(play$value_Albuminuria=="Macro", 1, 0)
 play$micro_Albuminuria <- ifelse(play$value_Albuminuria=="Micro", 1, 0)
 
 # remove intermediate variables and  info past censoring time
-play <- play[, -c('time.event.1', 'time.event.2,', 'time.event.0', 
+play <- play[, -c('time.event.1', 'time.event.2', 'time.event.0', 
                   'uncensored_time', 'uncensored_event')]
 
 
