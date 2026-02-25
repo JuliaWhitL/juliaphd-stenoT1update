@@ -77,6 +77,8 @@ library(lava)
 library(data.table)
 library(riskRegression)
 library(survival)
+library(randomForestSRC)
+library(rms)
 
 ### Generate 'play' data ---
 # Returns data.table with baseline covariates and time to cvd (time,event) 
@@ -96,23 +98,35 @@ play$micro_Albuminuria <- ifelse(play$value_Albuminuria=="Micro", 1, 0)
 # remove intermediate variables and  info past censoring time
 play <- play[, -c('time.event.1', 'time.event.2', 'time.event.0', 
                   'uncensored_time', 'uncensored_event')]
+##  ------------------------------------------------------------------------
+##  TAG's 5 (unfinished, waiting for riskRegression update)
+##  ------------------------------------------------------------------------
 
-
-## EXAMPLE ---
-# fit_bench <- CSC(Hist(time, event) ~ age + sex + diabetes_duration, data = play, cause = 1)
-# 
-# iv <- riskRegression::Score(list(
-#   "benchmark" = fit_bench
-#   # , model 2, etc.
-#   ),
-#    data = play,
-#    seed = 8,
-#    null.model = TRUE,
-#    formula = Hist(time, event) ~ 1,
-#    times = c(5,10), 
-#    cause = 1,
-#    split.method = "cv10",
-#    summary = "ipa"
-#  )
-#  summary(iv, what = 'score')
+fit_bench <- CSC(Hist(time, event) ~ age + sex + diabetes_duration, data = play, cause = 1)
+tag1 <- CSC(list(Hist(time, event) ~ age + sex + diabetes_duration+value_SBP+value_LDL+value_HBA1C+value_Albuminuria+log(eGFR)*age_cat+
+                     value_Smoking+value_Motion,
+                 Hist(time, event) ~ age + sex + diabetes_duration), data = play)
+tag2 <- CSC(list(Hist(time, event) ~ age + sex + diabetes_duration+value_SBP+value_LDL+value_HBA1C+value_Albuminuria+log(eGFR)*age_cat+
+                     value_Smoking+value_Motion,
+                 Hist(time, event) ~ age + sex + diabetes_duration), data = play,fitter = "glmnet",alpha = 0,
+            penalty.factor = pf)
+tag3 <- CSC(list(Hist(time, event) ~ age + sex + diabetes_duration+rcs(value_SBP,3)+value_LDL+log(value_HBA1C)+value_Albuminuria+log(eGFR)*age_cat+
+                     value_Smoking+value_Motion,
+                 Hist(time, event) ~ age + sex + diabetes_duration), data = play,fitter = "cph")
+tag4 <- rfsrc(Surv(time, event) ~ age + sex + diabetes_duration+value_SBP+value_LDL+value_HBA1C+value_Albuminuria+eGFR+
+                  value_Smoking+value_Motion,data = play,ntree = 1000,nodesize = 100,mtry = 2)
+tag5 <- rfsrc(Surv(time, event) ~ age + sex + diabetes_duration+value_SBP+value_LDL+value_HBA1C+value_Albuminuria+eGFR+
+                  value_Smoking+value_Motion,data = play,ntree = 1000,nodesize = 50,mtry = 2)
+iv <- riskRegression::Score(list(
+                          "benchmark" = fit_bench, tag1, tag2, tag3, tag4, tag5),
+                          data = play,
+                          seed = 8,
+                          null.model = TRUE,
+                          formula = Hist(time, event) ~ 1,
+                          times = c(5,10), 
+                          cause = 1,
+                          split.method = "cv10",
+                          summary = "ipa"
+                          )
+summary(iv, what = 'score')
  
