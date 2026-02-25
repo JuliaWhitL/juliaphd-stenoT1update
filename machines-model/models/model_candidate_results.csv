@@ -1,0 +1,7 @@
+model,model_type,brier_5y,params
+CSC_spline_interaction,CSC,0.173515271906929,spline_interaction
+PseudoGLMnet_alpha_1,pseudo_glmnet,0.174701245086891,"1;5,10"
+PseudoGLMnet_alpha_0.5,pseudo_glmnet,0.17478908670313,"0.5;5,10"
+PseudoGLMnet_alpha_0,pseudo_glmnet,0.174942055044977,"0;5,10"
+CSC_spline,CSC,0.175432205652153,spline
+FGR_linear,FGR,0.177236501703044,linear
